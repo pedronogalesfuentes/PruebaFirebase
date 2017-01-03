@@ -17,6 +17,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    //AÑADIDO PARA FIREBASE SEGUN TUTORIAL https://cloud.google.com/solutions/mobile/firebase-app-engine-android-studio
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'META-INF/NOTICE'
+    }
+    // FIN AÑADIDO PARA FIREBASE
 }
 
 dependencies {
@@ -26,6 +33,9 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
+    //AÑADIDO PARA FIREBASE SEGUN TUTORIAL https://cloud.google.com/solutions/mobile/firebase-app-engine-android-studio
+    compile 'com.google.firebase:firebase-database:9.6.1'
+    // FIN AÑADIDO PARA FIREBASE
 }
 
 // Add to the bottom of the file FOR FIREBASE
