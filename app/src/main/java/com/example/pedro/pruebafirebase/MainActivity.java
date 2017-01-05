@@ -2,6 +2,7 @@ package com.example.pedro.pruebafirebase;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     //INI: lista de variables necesarias para crear la lista
     private String[] lista = {"Windows", "Linux", "OSx"}; //Array de String que contiene los valores de la lista
     private ListView listaListView; // objeto de tipo ListView que enlazaremos al ListView que hemos creado en el Layout
-    private ArrayAdapter arrayAdapter; //objeto de tipo ArrayAdapter necesario para enganchar el array al ListView
+    //private ArrayAdapter arrayAdapter; //objeto de tipo ArrayAdapter necesario para enganchar el array al ListView
     //FIN: lista de variables necesarias para crear la lista
 
 
@@ -31,6 +32,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+//INI ahora hago una lista
+        listaListView = (ListView) findViewById(R.id.listView); // asociamos a nuestro objeto ListView el que hemos creado en el Layout
+        ArrayAdapter <String> arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, lista); /* construimos un objeto ArrayAdapter con los siguientes parámetros:
+contexto = this
+layout = un layout estándar de Android, en concreto el android.R.layout.simple_list_item_1
+array = el array que hemos creado, sisOp */
+        listaListView.setAdapter(arrayAdapter); //asociamos al ListView el ArrayAdapter que hemos construido
+        listaListView.setOnItemClickListener( //definimos el método callback en caso de pulsar sobre un item de la lista
+                new AdapterView.OnItemClickListener() {//construimos un nuevo método
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        int itemPosition = position; //esta es la posición del item pulsado (empieza a contar en cero)
+                        String itemValue = (String) listaListView.getItemAtPosition(itemPosition); //este es el string del item pulsado
+                        Toast.makeText(getApplication(), "Seleccion en lista:" + itemValue, Toast.LENGTH_SHORT).show();
+                    }
+                });
+        final String item = "item";
+        arrayAdapter.add(item); //////ME ESTA FALLANDO ESTO EL .ADD DE UN ARRAY ADAPTER
+//FIN ahora hago una lista
+
 
 //INI Create Firebase database object by using the following code:
         // Connect to the Firebase database
@@ -51,11 +74,46 @@ public class MainActivity extends AppCompatActivity {
                 //Get the text from Edit text
                 String text = texto2.getText().toString();
                 //INI set it on Firebase
-                myRef.setValue(text);
+                //myRef.setValue(text);
                 //FIN set it on Firebase
             }
         });
 
+        //INI
+
+        // Assign a listener to detect changes to the child items
+        // of the database reference.
+        myRef.addChildEventListener(new ChildEventListener(){
+
+        // This function is called once for each child that exists
+        // when the listener is added. Then it is called
+        // each time a new child is added.
+        @Override
+        public void onChildAdded (DataSnapshot dataSnapshot, String previousChildName) {
+            String value = dataSnapshot.getValue(String.class);
+            Toast.makeText(getApplication(), "onChildAdded:" + value, Toast.LENGTH_SHORT).show();
+            //arrayAdapter.add(value);
+        }
+
+        // This function is called each time a child item is removed.
+    public void onChildRemoved(DataSnapshot dataSnapshot){
+        String value = dataSnapshot.getValue(String.class);
+        Toast.makeText(getApplication(), "onChildRemoved:" + value, Toast.LENGTH_SHORT).show();
+        //arrayAdapter.remove(value);
+    }
+
+    // The following functions are also required in ChildEventListener implementations.
+    public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName){}
+    public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName){}
+
+    @Override
+    public void onCancelled(DatabaseError error) {
+        // Failed to read value
+        Log.w("TAG:", "Failed to read value.", error.toException());
+    }
+});
+        //FIN
+/*
 //INI In order to listen to changes to Firebase.
         //http://kodesnippets.com/index.php/2016/05/29/getting-started-with-firebase-in-android/
         //defino para la BBDD myRef un ValueEventListener
@@ -73,23 +131,7 @@ public class MainActivity extends AppCompatActivity {
         });
 //FIN  In order to listen to changes to Firebase.
 
-//INI ahora hago una lista
-        listaListView = (ListView) findViewById(R.id.listView); // asociamos a nuestro objeto ListView el que hemos creado en el Layout
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, lista); /* construimos un objeto ArrayAdapter con los siguientes parámetros:
-contexto = this
-layout = un layout estándar de Android, en concreto el android.R.layout.simple_list_item_1
-array = el array que hemos creado, sisOp */
-        listaListView.setAdapter(arrayAdapter); //asociamos al ListView el ArrayAdapter que hemos construido
-        listaListView.setOnItemClickListener( //definimos el método callback en caso de pulsar sobre un item de la lista
-                new AdapterView.OnItemClickListener() {//construimos un nuevo método
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        int itemPosition = position; //esta es la posición del item pulsado (empieza a contar en cero)
-                        String itemValue = (String) listaListView.getItemAtPosition(itemPosition); //este es el string del item pulsado
-                        Toast.makeText(getApplication(), "Seleccion en lista:" + itemValue, Toast.LENGTH_SHORT).show();
-                    }
-                });
-//FIN ahora hago una lista
+*/
 
     }
 }
