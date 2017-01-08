@@ -36,6 +36,7 @@ dependencies {
     //AÑADIDO PARA FIREBASE SEGUN TUTORIAL https://cloud.google.com/solutions/mobile/firebase-app-engine-android-studio
     compile 'com.google.firebase:firebase-database:9.6.1'
     // FIN AÑADIDO PARA FIREBASE
+    compile 'com.google.android.gms:play-services-appindexing:9.6.1'
 }
 
 // Add to the bottom of the file FOR FIREBASE
