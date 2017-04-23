@@ -26,7 +26,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -74,12 +76,19 @@ public class MainActivity extends AppCompatActivity {
 
                 //INI eliminamos el elemento seleccionado
 
-                    Query myQuery = myRef.orderByValue().equalTo((String) listaListView.getItemAtPosition(position));
+                    String elementoSeleccionado = (String) listaListView.getItemAtPosition(position);
+                    Query myQuery = myRef.orderByValue();
+
+                    //Toast.makeText(getApplication(), "elementoSeleccionado:" + elementoSeleccionado, Toast.LENGTH_SHORT).show();
                     myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
+
+
                             if (dataSnapshot.hasChildren()) {
+
                                 DataSnapshot firstChild = dataSnapshot.getChildren().iterator().next();
+                                Toast.makeText(getApplication(), "iterado:" + firstChild.getValue().toString(), Toast.LENGTH_SHORT).show();
                                 firstChild.getRef().removeValue();
                             }
                         }
@@ -88,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onCancelled(DatabaseError databaseError) {
                         }
                     });
+                //FIN eliminamos el elemento seleccionado
             }
         });
 
@@ -98,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         //creamos la variable ligada al editText en el que introduciremos el texto cada vez que queramos
         //introducir un nuevo campo en la lista
         final EditText editText = (EditText) findViewById(R.id.editText);
+        final EditText editText2 = (EditText) findViewById(R.id.editText2);
 
         //creamos un botón ligado al recurso button2
         //le asociamos un OnClickListener que leera el texto de la variable texto2 y lo introducirá en la BBDD Firebase
@@ -107,17 +118,23 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //Get the text from Edit text
                 String texto = (String) editText.getText().toString();
+                String texto2 = (String) editText2.getText().toString();
                 //adapter.add(texto);
 
                 //INI set it on Firebase
                 //myRef.setValue(texto);
-
+/* ESTO FUNCIONA BIEN, LO HE QUITADO PARA PROBAR A GUARDAR UN OBJETO
                 // Create a new child with a auto-generated ID.
                 DatabaseReference childRef = myRef.push();
 
                 // Set the child's data to the value passed in from the text box.
                 childRef.setValue(texto);
                 //FIN set it on Firebase
+*/
+
+                //INI  GUARDAR UN OBJETO
+                   guardaUsuarioEnFirebase(new User(texto, texto2));
+                // GUARDAR UN OBJETO
             }
         });
 
@@ -132,9 +149,10 @@ public class MainActivity extends AppCompatActivity {
             // each time a new child is added.
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                String value = dataSnapshot.getValue(String.class);
-                Toast.makeText(getApplication(), "onChildAdded:" + value, Toast.LENGTH_SHORT).show();
-                adapter.add(value);
+                User usuario = dataSnapshot.getValue(User.class);
+                String nombre = usuario.getFull_name();
+                Toast.makeText(getApplication(), "onChildAdded:" + nombre, Toast.LENGTH_SHORT).show();
+                adapter.add(nombre);
             }
 
             // This function is called each time a child item is removed.
@@ -217,6 +235,14 @@ public class MainActivity extends AppCompatActivity {
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
+    }
+
+    public void guardaUsuarioEnFirebase(User usuario){
+        // Create a new child with a auto-generated ID.
+        DatabaseReference childRef = myRef.push();
+        // Set the child's data to the value passed in from the text box.
+        childRef.setValue(usuario);
+        //FIN PROBAMOS A GUARDAR UN OBJETO
     }
 }
 
